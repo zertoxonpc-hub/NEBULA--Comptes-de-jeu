@@ -397,16 +397,17 @@
       <form id="login-form">
         <div class="field">
           <label>E-mail</label>
-          <input type="email" placeholder="toi@exemple.com" required>
+          <input type="email" id="login-email" placeholder="toi@exemple.com" required>
         </div>
         <div class="field">
           <label>Mot de passe</label>
-          <input type="password" placeholder="••••••••" required>
+          <input type="password" id="login-password" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn btn-primary auth-submit">Se connecter</button>
+        <p class="form-error" id="login-error">E-mail ou mot de passe incorrect.</p>
       </form>
       <div class="auth-switch">Pas encore de compte ? <a href="#" id="switch-to-register">Crée-en un</a></div>
-      <p class="disclaimer">⚠ Aucune vraie base de comptes : n'importe quel e-mail/mot de passe débloque l'achat pour cette visite.</p>
+      <p class="disclaimer">✓ Ton compte est un vrai compte en ligne : il fonctionne sur tous tes appareils et navigateurs, tant que tu utilises le même e-mail et mot de passe.</p>
     </div>
 
     <!-- REGISTER PANEL -->
@@ -461,7 +462,7 @@
       </div>
 
       <div class="auth-switch" id="switch-to-login-wrap">Déjà un compte ? <a href="#" id="switch-to-login">Se connecter</a></div>
-      <p class="disclaimer">⚠ Pas de vraie base de données : le compte n'existe que pour cette visite. Pour des comptes permanents (plusieurs appareils, historique), il faudrait un vrai serveur derrière le site.</p>
+      <p class="disclaimer">✓ Le compte est créé en ligne (Firebase) et synchronisé sur tous les appareils. Le mot de passe est géré et sécurisé directement par Firebase, jamais stocké en clair.</p>
     </div>
 
   </div>
@@ -477,15 +478,93 @@
   const EMAILJS_TEMPLATE_ID = 'template_u51853i';
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 </script>
+<script type="module">
+  // ==========================================================
+  // --- VRAIS comptes en ligne, synchronisés entre appareils/navigateurs ---
+  // Utilise Firebase (gratuit) : Authentication pour email + mot de passe,
+  // Firestore pour stocker le pseudo et l'avatar de chaque compte.
+  //
+  // ⚠ CONFIGURATION REQUISE (5 minutes, gratuit) :
+  // 1. Va sur https://console.firebase.google.com → "Ajouter un projet"
+  // 2. Dans le projet : icône </> "Ajouter une application Web" → copie l'objet
+  //    firebaseConfig qui s'affiche, et colle-le ci-dessous à la place de celui-ci.
+  // 3. Menu "Authentication" → onglet "Sign-in method" → active "Adresse e-mail/Mot de passe"
+  // 4. Menu "Firestore Database" → "Créer une base de données" → mode production.
+  //    Puis onglet "Règles", remplace par :
+  //      rules_version = '2';
+  //      service cloud.firestore {
+  //        match /databases/{database}/documents {
+  //          match /users/{userId} {
+  //            allow read, write: if request.auth != null && request.auth.uid == userId;
+  //          }
+  //        }
+  //      }
+  // ==========================================================
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    fetchSignInMethodsForEmail, onAuthStateChanged, signOut
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+  import {
+    getFirestore, doc, setDoc, getDoc
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA5zw3pOUt3e1T-Drlhozl6raR7oCncM1c",
+    authDomain: "siteventecompte.firebaseapp.com",
+    projectId: "siteventecompte",
+    storageBucket: "siteventecompte.firebasestorage.app",
+    messagingSenderId: "998949778811",
+    appId: "1:998949778811:web:e584d43ccfb30eb83d79de"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Rend les fonctions accessibles aux autres <script> classiques de la page.
+  window.__auth = auth;
+  window.__db = db;
+  window.__fb = {
+    createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    fetchSignInMethodsForEmail, onAuthStateChanged, signOut, doc, setDoc, getDoc
+  };
+
+  // Reconnexion automatique : si l'utilisateur est déjà connecté sur cet appareil
+  // (Firebase garde la session), ou s'il vient de se connecter ailleurs avec le
+  // même compte, ce compte fonctionnera partout puisqu'il est stocké en ligne.
+  onAuthStateChanged(auth, async (user)=>{
+    if(user && window.__goAuthenticatedOnLoad !== false){
+      try{
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        const profile = snap.exists() ? snap.data() : {};
+        window.goAuthenticated(profile.pseudo || user.email.split('@')[0], profile.avatar || null);
+      } catch(err){ console.error(err); }
+    }
+  });
+</script>
 <script>
-  // --- Connexion (démo, sans vraie base de comptes) ---
-  document.getElementById('login-form').addEventListener('submit', (e)=>{
+  // --- Connexion : vérifie l'e-mail + mot de passe via Firebase (compte en ligne) ---
+  document.getElementById('login-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    const emailInput = e.target.querySelector('input[type="email"]');
-    const email = emailInput ? emailInput.value.trim() : '';
-    const pseudo = email.split('@')[0] || 'Membre';
-    const avatar = makeMonogramAvatar(pseudo);
-    goAuthenticated(pseudo, avatar);
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+    const submitBtn = e.target.querySelector('.auth-submit');
+
+    submitBtn.disabled = true;
+    try{
+      window.__goAuthenticatedOnLoad = false; // on gère la redirection nous-mêmes ci-dessous
+      const cred = await window.__fb.signInWithEmailAndPassword(window.__auth, email, password);
+      errorEl.style.display = 'none';
+      const snap = await window.__fb.getDoc(window.__fb.doc(window.__db, 'users', cred.user.uid));
+      const profile = snap.exists() ? snap.data() : {};
+      goAuthenticated(profile.pseudo || email.split('@')[0], profile.avatar || null);
+    } catch(err){
+      console.error(err);
+      errorEl.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 
   function goAuthenticated(pseudo, avatar){
@@ -573,13 +652,29 @@
     });
   }
 
-  document.getElementById('register-form').addEventListener('submit', (e)=>{
+  document.getElementById('register-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
     pendingUser.pseudo = document.getElementById('reg-pseudo').value.trim();
-    pendingUser.email = document.getElementById('reg-email').value.trim();
-    if(!pendingUser.pseudo || !pendingUser.email) return;
+    pendingUser.email = document.getElementById('reg-email').value.trim().toLowerCase();
+    pendingUser.password = document.getElementById('reg-password').value;
+    if(!pendingUser.pseudo || !pendingUser.email || !pendingUser.password) return;
 
     const btn = document.getElementById('send-code-btn');
+    btn.textContent = 'Vérification…';
+    btn.disabled = true;
+
+    try{
+      const methods = await window.__fb.fetchSignInMethodsForEmail(window.__auth, pendingUser.email);
+      if(methods.length > 0){
+        alert('Un compte existe déjà avec cet e-mail. Connecte-toi plutôt.');
+        btn.textContent = 'Recevoir mon code par e-mail';
+        btn.disabled = false;
+        return;
+      }
+    } catch(err){
+      console.error(err);
+    }
+
     btn.textContent = 'Envoi en cours…';
     btn.disabled = true;
 
@@ -610,15 +705,36 @@
       });
   });
 
-  // --- Étape 2 : vérification du code ---
-  document.getElementById('verify-code-btn').addEventListener('click', ()=>{
+  // --- Étape 2 : vérification du code, puis création réelle du compte en ligne (Firebase) ---
+  document.getElementById('verify-code-btn').addEventListener('click', async ()=>{
     const entered = document.getElementById('code-input').value.trim();
     const errorEl = document.getElementById('code-error');
     if(entered && entered === pendingCode){
       errorEl.style.display = 'none';
-      document.getElementById('register-step2').style.display = 'none';
-      document.getElementById('register-success').style.display = 'block';
-      setTimeout(()=> goAuthenticated(pendingUser.pseudo, pendingUser.avatar || makeMonogramAvatar(pendingUser.pseudo)), 1100);
+
+      const verifyBtn = document.getElementById('verify-code-btn');
+      verifyBtn.disabled = true;
+
+      try{
+        window.__goAuthenticatedOnLoad = false; // on gère la redirection nous-mêmes ci-dessous
+        const cred = await window.__fb.createUserWithEmailAndPassword(
+          window.__auth, pendingUser.email, pendingUser.password
+        );
+        const avatar = pendingUser.avatar || makeMonogramAvatar(pendingUser.pseudo);
+        await window.__fb.setDoc(window.__fb.doc(window.__db, 'users', cred.user.uid), {
+          pseudo: pendingUser.pseudo,
+          email: pendingUser.email,
+          avatar: avatar
+        });
+
+        document.getElementById('register-step2').style.display = 'none';
+        document.getElementById('register-success').style.display = 'block';
+        setTimeout(()=> goAuthenticated(pendingUser.pseudo, avatar), 1100);
+      } catch(err){
+        console.error(err);
+        alert("La création du compte a échoué : " + (err.message || 'vérifie ta configuration Firebase.'));
+        verifyBtn.disabled = false;
+      }
     } else {
       errorEl.style.display = 'block';
     }
