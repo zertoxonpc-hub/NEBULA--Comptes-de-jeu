@@ -362,6 +362,101 @@
     background:rgba(62,224,137,0.09); border:1px solid rgba(62,224,137,0.3);
     font-size:13.5px; color:var(--success); text-align:center;
   }
+
+  @media (max-width:768px){
+    .auth-wrap{
+      margin:40px auto;
+    }
+    .auth-card{
+      width:100%; max-width:none;
+      padding:28px 20px;
+    }
+    .auth-tabs{gap:4px;}
+    .auth-tab{font-size:12px; padding:8px;}
+    h1{font-size:22px;}
+    .sub2{font-size:13px;}
+    .avatar-field{margin-bottom:18px;}
+    .avatar-upload{width:80px; height:80px;}
+    .avatar-hint{font-size:10px;}
+    .field input, .field textarea{padding:10px 12px; font-size:13px;}
+    .field label{font-size:12px; margin-bottom:6px;}
+    .auth-submit{width:100%; padding:11px; font-size:13px;}
+    .auth-switch{font-size:12px; margin-top:14px;}
+    .disclaimer{font-size:10px; margin-top:16px;}
+  }
+
+  @media (max-width:600px){
+    .auth-wrap{
+      padding:20px 16px;
+      margin:30px auto;
+    }
+    .auth-card{
+      padding:20px 16px;
+      border-radius:14px;
+    }
+    .auth-tabs{gap:3px; padding:4px;}
+    .auth-tab{font-size:11px; padding:7px 10px; border-radius:6px;}
+    h1{font-size:20px; margin-bottom:6px;}
+    .sub2{font-size:12px; margin-bottom:16px;}
+    
+    .avatar-field{margin-bottom:16px;}
+    .avatar-upload{
+      width:76px; height:76px;
+      border-radius:50%;
+    }
+    .avatar-hint{font-size:9.5px; margin-top:6px;}
+
+    .field{margin-bottom:14px;}
+    .field label{
+      font-size:11.5px; margin-bottom:5px;
+    }
+    .field input, .field textarea{
+      padding:9px 11px; font-size:12px;
+      border-radius:8px;
+    }
+    .field textarea{resize:vertical;}
+
+    .code-input{font-size:18px; letter-spacing:6px;}
+    .form-error, .success-box{font-size:12px;}
+    .auth-submit{
+      width:100%; padding:10px; font-size:12px;
+      border-radius:9px;
+    }
+    .auth-switch{font-size:11.5px; margin-top:12px;}
+    .disclaimer{font-size:9.5px; margin-top:14px; line-height:1.4;}
+  }
+
+  @media (max-width:480px){
+    .auth-wrap{
+      padding:16px 12px;
+      margin:20px auto;
+    }
+    .auth-card{
+      padding:16px 14px;
+      border-radius:12px;
+    }
+    .auth-tabs{gap:2px; padding:3px;}
+    .auth-tab{font-size:10px; padding:6px 8px;}
+    h1{font-size:18px; margin-bottom:4px;}
+    .sub2{font-size:11px; margin-bottom:12px;}
+
+    .avatar-field{margin-bottom:14px;}
+    .avatar-upload{width:72px; height:72px;}
+    .avatar-hint{font-size:9px;}
+
+    .field{margin-bottom:11px;}
+    .field label{font-size:10.5px; margin-bottom:4px;}
+    .field input, .field textarea{
+      padding:8px 10px; font-size:11px;
+    }
+
+    .code-input{font-size:16px; letter-spacing:4px;}
+    .form-error, .success-box{font-size:11px;}
+    .auth-submit{padding:9px; font-size:11px;}
+    .auth-switch{font-size:10.5px; margin-top:10px;}
+    .disclaimer{font-size:8.5px; margin-top:12px;}
+  }
+
 </style>
 </head>
 <body>

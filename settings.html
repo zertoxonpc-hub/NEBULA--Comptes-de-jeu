@@ -158,14 +158,157 @@
     color:var(--text-faint); font-size:13px; margin-bottom:14px;
   }
 
-  @media (max-width:600px){
-    .settings-wrap{
-      margin:40px auto;
+  @media (max-width:900px){
+    nav{padding:14px 16px;}
+    .settings-wrap{margin:50px auto;}
+  }
+
+  @media (max-width:768px){
+    nav{
+      flex-wrap:wrap;
+      padding:12px 16px;
     }
+    .logo{font-size:18px;}
+    .settings-wrap{
+      max-width:100%;
+      margin:40px auto;
+      padding:0 24px;
+    }
+    .settings-header h1{font-size:26px;}
+    .settings-header p{font-size:14px;}
     .settings-panel{
-      padding:20px;
+      padding:24px; margin-bottom:20px;
+    }
+    .settings-panel h2{font-size:16px;}
+    .avatar-display{width:100px; height:100px;}
+    .form-group label{font-size:12px;}
+    .form-group input{padding:11px 13px; font-size:13px;}
+    .form-actions{flex-direction:column;}
+    .form-actions .btn{font-size:13px;}
+  }
+
+  @media (max-width:600px){
+    .wrap{padding:0 16px;}
+    nav{
+      padding:12px 16px;
+      flex-direction:column; gap:10px;
+    }
+    .logo{font-size:16px;}
+    .settings-wrap{
+      max-width:100%;
+      margin:30px auto;
+      padding:0 16px;
+    }
+    .settings-header{
+      margin-bottom:28px;
+      text-align:center;
+    }
+    .settings-header h1{
+      font-size:22px; margin-bottom:6px;
+    }
+    .settings-header p{font-size:13px; color:var(--text-dim);}
+    
+    .settings-panel{
+      padding:18px 16px; margin-bottom:16px;
+      border-radius:14px;
+    }
+    .settings-panel h2{
+      font-size:15px; margin-bottom:16px;
+      gap:6px;
+    }
+
+    .avatar-section{margin-bottom:20px;}
+    .avatar-display{
+      width:90px; height:90px;
+      margin-bottom:12px;
+      border-width:2px;
+    }
+    .avatar-upload-btn{
+      padding:8px 14px; font-size:12px;
+    }
+
+    .form-group{margin-bottom:14px;}
+    .form-group label{
+      font-size:11.5px; margin-bottom:6px;
+    }
+    .form-group input, .form-group textarea{
+      padding:10px 12px; font-size:12px;
+      border-radius:8px;
+    }
+
+    .form-actions{
+      flex-direction:column; gap:8px;
+      margin-top:16px;
+    }
+    .form-actions .btn{
+      width:100%; padding:10px;
+      font-size:12px; border-radius:8px;
+    }
+
+    .success-msg, .error-msg{
+      font-size:12px; margin-top:10px;
+    }
+
+    .danger-zone{
+      padding:16px; margin-top:20px;
+      border-radius:12px;
+    }
+    .danger-zone h3{
+      font-size:14px; margin-bottom:10px;
+    }
+    .danger-zone p{
+      font-size:12px; margin-bottom:12px;
+    }
+    .danger-zone .btn{
+      width:100%; padding:9px;
+      font-size:12px;
     }
   }
+
+  @media (max-width:480px){
+    nav{padding:10px 12px;}
+    .logo{font-size:14px;}
+    .settings-wrap{
+      margin:20px auto;
+      padding:0 12px;
+    }
+    .settings-header h1{
+      font-size:20px; margin-bottom:4px;
+    }
+    .settings-header p{font-size:12px;}
+    
+    .settings-panel{
+      padding:14px 12px; margin-bottom:12px;
+    }
+    .settings-panel h2{font-size:14px; margin-bottom:12px;}
+
+    .avatar-display{
+      width:80px; height:80px;
+      margin-bottom:10px;
+    }
+    .avatar-upload-btn{
+      padding:7px 12px; font-size:11px;
+    }
+
+    .form-group{margin-bottom:11px;}
+    .form-group label{font-size:10.5px; margin-bottom:5px;}
+    .form-group input, .form-group textarea{
+      padding:8px 10px; font-size:11px;
+    }
+
+    .form-actions{margin-top:12px; gap:6px;}
+    .form-actions .btn{padding:8px; font-size:11px;}
+
+    .success-msg, .error-msg{font-size:11px; margin-top:8px;}
+
+    .danger-zone{
+      padding:12px; margin-top:16px;
+    }
+    .danger-zone h3{font-size:13px; margin-bottom:8px;}
+    .danger-zone p{font-size:11px; margin-bottom:10px;}
+    .danger-zone .btn{padding:8px; font-size:11px;}
+  }
+
 </style>
 </head>
 <body>
